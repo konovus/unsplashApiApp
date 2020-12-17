@@ -1,6 +1,7 @@
 package com.konovus.unsplashapiapp.network;
 
 import com.konovus.unsplashapiapp.models.Photo;
+import com.konovus.unsplashapiapp.responses.SearchPhotoResponse;
 
 import java.util.List;
 
@@ -14,4 +15,9 @@ public interface ApiService {
     Call<List<Photo>> getPhotos(@Query("order_by") String order_by,
                                 @Query("page") int page,
                                 @Query("client_id") String client_id);
+
+    @GET("search/photos")
+    Call<SearchPhotoResponse> searchPhotos(@Query("query") String query,
+                                           @Query("page") int page,
+                                           @Query("client_id") String client_id);
 }

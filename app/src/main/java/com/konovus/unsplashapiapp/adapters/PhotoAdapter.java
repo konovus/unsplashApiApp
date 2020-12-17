@@ -80,10 +80,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             photoItemBinding.photo.setOnClickListener(v -> toggleBtnsVisibility());
             photoItemBinding.likeBtn.setOnClickListener(v -> {
                 photoListener.onFavoriteClicked(photo);
-
-                photoItemBinding.likeBtn.setBackgroundResource(R.drawable.icons_fav_bg_shape);
-//                Changing color for the icon (vector drawable)
-                photoItemBinding.likeBtn.setColorFilter(ContextCompat.getColor(context, R.color.colorIconsBG), android.graphics.PorterDuff.Mode.SRC_IN);
+                toggleFav(photoItemBinding);
             });
             photoItemBinding.downloadBtn.setOnClickListener(v -> {
                 new MyAsyncTask(photoItemBinding, context, photo).execute(photo.getUrls().getFull());
@@ -105,6 +102,26 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
     public interface PhotoListener{
         void onFavoriteClicked(Photo photo);
         void onDownloadClicked(Photo photo);
+    }
+
+    public void setPhotos(List<Photo> photos){
+        this.photos = photos;
+        notifyDataSetChanged();
+    }
+
+    private void toggleFav(PhotoItemBinding photoItemBinding){
+        if(photoItemBinding.likeBtn.getTag() == null || photoItemBinding.likeBtn.getTag().toString().isEmpty()){
+            photoItemBinding.likeBtn.setBackgroundResource(R.drawable.icons_fav_bg_shape);
+//                Changing color for the icon (vector drawable)
+            photoItemBinding.likeBtn.setColorFilter(ContextCompat.getColor(context, R.color.colorIconsBG), android.graphics.PorterDuff.Mode.SRC_IN);
+            photoItemBinding.likeBtn.setTag("Fav");
+        } else {
+            photoItemBinding.likeBtn.setBackgroundResource(R.drawable.icons_bg_shape);
+//                Changing color for the icon (vector drawable)
+            photoItemBinding.likeBtn.setColorFilter(ContextCompat.getColor(context, R.color.colorIcons), android.graphics.PorterDuff.Mode.SRC_IN);
+            photoItemBinding.likeBtn.setTag("");
+
+        }
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Long> {

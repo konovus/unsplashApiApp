@@ -29,6 +29,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/header_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_8sdp"
@@ -41,20 +42,37 @@
                 android:textColor="#fff"
                 android:textSize="@dimen/_14ssp"
                 />
-            <ImageView
-                android:id="@+id/favourites_img"
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
-                android:src="@drawable/ic_favorite"
-                android:tint="#fff"
-                android:padding="@dimen/_2sdp"
-                android:layout_marginRight="@dimen/_8sdp"
-                />
+            <EditText
+                android:visibility="gone"
+                android:id="@+id/search_et"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:fontFamily="@font/ubuntu_regular"
+                android:hint="Search Photos"
+                android:imeOptions="actionDone"
+                android:importantForAutofill="no"
+                android:includeFontPadding="false"
+                android:inputType="text"
+                android:textColor="#fff"
+                android:textColorHint="@color/colorPrimary"
+                android:textSize="@dimen/_13ssp"/>
             <ImageView
                 android:id="@+id/search_img"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:src="@drawable/ic_search"
+                android:tint="#fff"
+                android:padding="@dimen/_2sdp"
+                android:layout_marginRight="@dimen/_8sdp"
+                />
+            <ImageView
+                android:id="@+id/favourites_img"
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:src="@drawable/ic_favorite"
                 android:tint="#fff"
                 android:padding="@dimen/_2sdp"
                 android:layout_marginRight="@dimen/_8sdp"

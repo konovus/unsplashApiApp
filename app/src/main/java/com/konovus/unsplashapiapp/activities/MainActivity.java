@@ -1,50 +1,48 @@
 package com.konovus.unsplashapiapp.activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.konovus.unsplashapiapp.R;
 import com.konovus.unsplashapiapp.adapters.PhotoAdapter;
 import com.konovus.unsplashapiapp.databinding.ActivityMainBinding;
 import com.konovus.unsplashapiapp.models.Photo;
+import com.konovus.unsplashapiapp.responses.SearchPhotoResponse;
 import com.konovus.unsplashapiapp.viewmodels.MainPhotosViewModel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements PhotoAdapter.PhotoListener {
 
     private ActivityMainBinding activityMainBinding;
     private MainPhotosViewModel mainPhotosViewModel;
     private List<Photo> photos = new ArrayList<>();
+    private List<Photo> search_photos = new ArrayList<>();
     private PhotoAdapter photoAdapter;
     private int currentPage = 1;
     private int totalPages = 10000;
+    private Timer timer;
+    private boolean isSearch;
+    private String query;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +65,94 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                 super.onScrolled(recyclerView, dx, dy);
                 if (!recyclerView.canScrollVertically(1)) {
                     currentPage++;
+                    if(!isSearch)
+                        getMainPhotos();
+                    else
+                        searchPhotos(query);
+                }
+            }
+        });
+        activityMainBinding.favouritesImg.setOnClickListener(v -> Toast.makeText(MainActivity.this, "ceva", Toast.LENGTH_SHORT).show());
+        activityMainBinding.searchImg.setOnClickListener(v -> {
+            if(activityMainBinding.searchImg.getTag() == null || activityMainBinding.searchImg.getTag().toString().isEmpty()) {
+                activityMainBinding.searchImg.setTag("Close");
+                activityMainBinding.searchImg.setImageResource(R.drawable.ic_close);
+                activityMainBinding.searchEt.setVisibility(View.VISIBLE);
+                activityMainBinding.headerText.setVisibility(View.GONE);
+                activityMainBinding.searchEt.requestFocus();
+                toggleKeyboard(this);
+            } else {
+                activityMainBinding.searchImg.setTag("");
+                activityMainBinding.searchImg.setImageResource(R.drawable.ic_search);
+                activityMainBinding.searchEt.setVisibility(View.GONE);
+                activityMainBinding.headerText.setVisibility(View.VISIBLE);
+                hideKeyboardFrom(this, v);
+            }
+
+
+        });
+        activityMainBinding.searchEt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (timer != null)
+                    timer.cancel();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                query = s.toString();
+
+                if (!s.toString().trim().isEmpty()) {
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    currentPage = 1;
+                                    totalPages = 1;
+                                    searchPhotos(query);
+                                }
+                            });
+                        }
+                    }, 800);
+                } else if(isSearch && s.toString().isEmpty()){
+                    isSearch = false;
+                    currentPage = 1;
+                    photos.clear();
+                    search_photos.clear();
                     getMainPhotos();
                 }
             }
         });
         getMainPhotos();
     }
-
+    private void searchPhotos(String query) {
+        isSearch = true;
+        toggleLoading();
+        mainPhotosViewModel.searchPhotos(currentPage, query, "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
+                .observe(this, new Observer<SearchPhotoResponse>() {
+            @Override
+            public void onChanged(SearchPhotoResponse searchPhotoResponse) {
+                toggleLoading();
+                if (searchPhotoResponse != null) {
+                    totalPages = searchPhotoResponse.getTotal_pages();
+                    int oldCount = search_photos.size();
+                    search_photos.addAll(searchPhotoResponse.getResults());
+                    if(oldCount == 0)
+                        photoAdapter.setPhotos(search_photos);
+                    else
+                        photoAdapter.notifyItemRangeInserted(oldCount, search_photos.size());
+                }
+            }
+        });
+    }
     private void getMainPhotos(){
         toggleLoading();
         mainPhotosViewModel.getMainPhotos(currentPage, "popular", "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
@@ -82,7 +161,10 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
             if(photosResponse != null && !photosResponse.isEmpty()){
                 int oldCount = photos.size();
                 photos.addAll(photosResponse);
-                photoAdapter.notifyItemRangeInserted(oldCount, oldCount+=10);
+                if(oldCount == 0)
+                    photoAdapter.setPhotos(photos);
+                else
+                    photoAdapter.notifyItemRangeInserted(oldCount, oldCount+=10);
             }
         });
     }
@@ -103,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
 
     @Override
     public void onFavoriteClicked(Photo photo) {
-
         Toast.makeText(this, "Clicked on Favorite " + photo.getId(), Toast.LENGTH_SHORT).show();
     }
 
@@ -112,7 +193,15 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
 
     }
 
-
-
+    private void toggleKeyboard(Context context){
+        InputMethodManager inputMgr = (InputMethodManager)context.
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,
+                InputMethodManager.RESULT_HIDDEN);
+    }
+    public static void hideKeyboardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
 }

@@ -3,6 +3,7 @@ package com.konovus.unsplashapiapp.repositories;
 import com.konovus.unsplashapiapp.models.Photo;
 import com.konovus.unsplashapiapp.network.ApiClient;
 import com.konovus.unsplashapiapp.network.ApiService;
+import com.konovus.unsplashapiapp.responses.SearchPhotoResponse;
 
 import java.util.List;
 
@@ -35,5 +36,21 @@ public class MainPhotosRepository {
             }
         });
         return photos;
+    }
+
+    public LiveData<SearchPhotoResponse> searchPhotos(int page, String query, String client_id){
+        MutableLiveData<SearchPhotoResponse> photosResponse = new MutableLiveData<>();
+        apiService.searchPhotos(query, page, client_id).enqueue(new Callback<SearchPhotoResponse>() {
+            @Override
+            public void onResponse(Call<SearchPhotoResponse> call, Response<SearchPhotoResponse> response) {
+                photosResponse.setValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<SearchPhotoResponse> call, Throwable t) {
+                photosResponse.setValue(null);
+            }
+        });
+        return photosResponse;
     }
 }
