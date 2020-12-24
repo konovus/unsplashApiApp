@@ -77,31 +77,17 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         public void bindPhoto(Photo photo){
             photoItemBinding.setPhoto(photo);
             photoItemBinding.executePendingBindings();
-            photoItemBinding.photo.setOnClickListener(v -> toggleBtnsVisibility());
-            photoItemBinding.likeBtn.setOnClickListener(v -> {
-                photoListener.onFavoriteClicked(photo);
-                toggleFav(photoItemBinding);
-            });
-            photoItemBinding.downloadBtn.setOnClickListener(v -> {
-                new MyAsyncTask(photoItemBinding, context, photo).execute(photo.getUrls().getFull());
-            });
-        }
-        public void toggleBtnsVisibility(){
-            if(photoItemBinding.cover.getVisibility() == View.GONE) {
-                photoItemBinding.cover.setVisibility(View.VISIBLE);
-                photoItemBinding.likeBtn.setVisibility(View.VISIBLE);
-                photoItemBinding.downloadBtn.setVisibility(View.VISIBLE);
-            } else {
-                photoItemBinding.cover.setVisibility(View.GONE);
-                photoItemBinding.likeBtn.setVisibility(View.GONE);
-                photoItemBinding.downloadBtn.setVisibility(View.GONE);
-            }
+            photoItemBinding.photo.setClipToOutline(true);
+            photoItemBinding.photo.setOnClickListener(v -> photoListener.onPhotoClicked(photo, v));
+
+//            photoItemBinding.downloadBtn.setOnClickListener(v -> {
+//                new MyAsyncTask(photoItemBinding, context, photo).execute(photo.getUrls().getFull());
+//            });
         }
     }
 
     public interface PhotoListener{
-        void onFavoriteClicked(Photo photo);
-        void onDownloadClicked(Photo photo);
+        void onPhotoClicked(Photo photo, View view);
     }
 
     public void setPhotos(List<Photo> photos){
@@ -109,20 +95,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         notifyDataSetChanged();
     }
 
-    private void toggleFav(PhotoItemBinding photoItemBinding){
-        if(photoItemBinding.likeBtn.getTag() == null || photoItemBinding.likeBtn.getTag().toString().isEmpty()){
-            photoItemBinding.likeBtn.setBackgroundResource(R.drawable.icons_fav_bg_shape);
-//                Changing color for the icon (vector drawable)
-            photoItemBinding.likeBtn.setColorFilter(ContextCompat.getColor(context, R.color.colorIconsBG), android.graphics.PorterDuff.Mode.SRC_IN);
-            photoItemBinding.likeBtn.setTag("Fav");
-        } else {
-            photoItemBinding.likeBtn.setBackgroundResource(R.drawable.icons_bg_shape);
-//                Changing color for the icon (vector drawable)
-            photoItemBinding.likeBtn.setColorFilter(ContextCompat.getColor(context, R.color.colorIcons), android.graphics.PorterDuff.Mode.SRC_IN);
-            photoItemBinding.likeBtn.setTag("");
 
-        }
-    }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, Long> {
 
@@ -191,28 +164,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         }
 
         protected void onPostExecute(Long result) {
+//          update the UI after background processes completes
 
             photoItemBinding.progressText.setText("");
             photoItemBinding.progressDownload.setProgress(0);
             photoItemBinding.progressDownload.setVisibility(View.GONE);
             photoItemBinding.progressText.setVisibility(View.GONE);
-// update the UI after background processes completes
         }
-    }
-
-    private void saveImage(Bitmap bitmap, String name, Context context) throws IOException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-
-//you can create a new file name "test.jpg" in sdcard folder.
-        File f = new File(context.getExternalFilesDir("/").getAbsolutePath()
-                + File.separator + name + ".jpg");
-        f.createNewFile();
-//write the bytes in file
-        FileOutputStream fo = new FileOutputStream(f);
-        fo.write(bytes.toByteArray());
-
-// remember close de FileOutput
-        fo.close();
     }
 }

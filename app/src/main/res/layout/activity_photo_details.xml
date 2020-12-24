@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="Photo"
+            type="com.konovus.unsplashapiapp.models.Photo" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/wrapper_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/_10sdp"
+        android:background="@drawable/photo_details_shape"
+        tools:context=".activities.PhotoDetailsActivity">
+
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/photo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imageURL="@{Photo.urls.thumb}"
+            android:maxHeight="@dimen/_400sdp"
+            android:minHeight="@dimen/_100sdp"
+            android:scaleType="center"
+            android:background="@drawable/photo_details_shape"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:transitionName="shared_transition" />
+        <com.github.chrisbanes.photoview.PhotoView
+            android:visibility="invisible"
+            android:id="@+id/photoFull"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="center"
+            android:background="@drawable/photo_details_shape"
+            app:layout_constraintBottom_toBottomOf="@id/photo"
+            app:layout_constraintTop_toTopOf="@id/photo"
+            app:layout_constraintLeft_toLeftOf="@id/photo"
+            app:layout_constraintRight_toRightOf="@id/photo"
+            android:transitionName="shared_transition" />
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/like_btn"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_32sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_marginHorizontal="@dimen/_5sdp"
+            app:layout_constraintBottom_toBottomOf="@id/photo"
+            app:layout_constraintEnd_toStartOf="@id/download_btn"
+            app:riv_corner_radius="@dimen/_10sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/ic_favorite"
+            android:tint="@color/colorIcons"
+            android:background="@drawable/icons_bg_shape"/>
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/download_btn"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_32sdp"
+            android:layout_centerVertical="true"
+            app:riv_corner_radius="@dimen/_10sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/ic_arrow_download"
+            android:tint="@color/colorIcons"
+            android:background="@drawable/icons_bg_shape"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            app:layout_constraintBottom_toBottomOf="@id/photo"
+            app:layout_constraintEnd_toEndOf="@id/photo"/>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/photo"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

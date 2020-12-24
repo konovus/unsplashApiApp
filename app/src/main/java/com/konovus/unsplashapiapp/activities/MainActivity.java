@@ -2,6 +2,8 @@ package com.konovus.unsplashapiapp.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -10,11 +12,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Fade;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
+//        transitionSetup();
         doInitialization();
     }
 
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                 }
             }
         });
-        activityMainBinding.favouritesImg.setOnClickListener(v -> Toast.makeText(MainActivity.this, "ceva", Toast.LENGTH_SHORT).show());
+        activityMainBinding.favouritesImg.setOnClickListener(v -> startActivity(new Intent(this, FavoritesActivity.class)));
         activityMainBinding.searchImg.setOnClickListener(v -> {
             if(activityMainBinding.searchImg.getTag() == null || activityMainBinding.searchImg.getTag().toString().isEmpty()) {
                 activityMainBinding.searchImg.setTag("Close");
@@ -117,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                                 public void run() {
                                     currentPage = 1;
                                     totalPages = 1;
+                                    search_photos.clear();
                                     searchPhotos(query);
                                 }
                             });
@@ -149,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                         photoAdapter.setPhotos(search_photos);
                     else
                         photoAdapter.notifyItemRangeInserted(oldCount, search_photos.size());
-                }
+                } else Toast.makeText(MainActivity.this, "No results found", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -165,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                     photoAdapter.setPhotos(photos);
                 else
                     photoAdapter.notifyItemRangeInserted(oldCount, oldCount+=10);
-            }
+            } else Toast.makeText(MainActivity.this, "No results found", Toast.LENGTH_LONG).show();
         });
     }
 
@@ -184,13 +189,12 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     }
 
     @Override
-    public void onFavoriteClicked(Photo photo) {
-        Toast.makeText(this, "Clicked on Favorite " + photo.getId(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onDownloadClicked(Photo photo) {
-
+    public void onPhotoClicked(Photo photo, View view) {
+        Intent intent = new Intent(MainActivity.this, PhotoDetailsActivity.class);
+        intent.putExtra("photo", photo);
+        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
+                .makeSceneTransitionAnimation(MainActivity.this, view, ViewCompat.getTransitionName(view));
+        startActivity(intent, optionsCompat.toBundle());
     }
 
     private void toggleKeyboard(Context context){
@@ -204,4 +208,14 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    private void transitionSetup(){
+        Fade fade = new Fade();
+        View decor =  getWindow().getDecorView();
+        fade.excludeTarget(decor.findViewById(R.id.action_bar_container), true);
+        fade.excludeTarget(decor.findViewById(android.R.id.statusBarBackground), true);
+        fade.excludeTarget(decor.findViewById(android.R.id.navigationBarBackground), true);
+        fade.excludeTarget(decor.findViewById(android.R.id.background), true);
+        getWindow().setEnterTransition(fade);
+        getWindow().setExitTransition(fade);
+    }
 }

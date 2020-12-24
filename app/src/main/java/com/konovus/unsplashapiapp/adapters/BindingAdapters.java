@@ -1,5 +1,6 @@
 package com.konovus.unsplashapiapp.adapters;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
@@ -20,7 +21,10 @@ public class BindingAdapters {
     public static void setImageURL(ImageView imageView, String URL){
         imageView.setAlpha(0f);
         if(URL != null && !URL.isEmpty())
-            Glide.with(imageView.getContext()).load(URL).addListener(
+            Glide.with(imageView.getContext())
+                    .load(URL)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .addListener(
                     new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

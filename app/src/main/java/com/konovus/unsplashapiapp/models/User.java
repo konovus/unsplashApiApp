@@ -3,20 +3,20 @@ package com.konovus.unsplashapiapp.models;
 import java.io.Serializable;
 
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity(tableName = "users")
 public class User implements Serializable {
 
+    @PrimaryKey
     private String id;
     private String username;
     private String name;
-    private ProfileImage profileImage;
 
-    public User(String id, String username, String name, ProfileImage profileImage) {
+    public User(String id, String username, String name) {
         this.id = id;
         this.username = username;
         this.name = name;
-        this.profileImage = profileImage;
     }
 
     public void setId(String id) {
@@ -31,9 +31,7 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public void setProfileImage(ProfileImage profileImage) {
-        this.profileImage = profileImage;
-    }
+
 
     public String getId() {
         return id;
@@ -47,7 +45,4 @@ public class User implements Serializable {
         return name;
     }
 
-    public ProfileImage getProfileImage() {
-        return profileImage;
-    }
 }

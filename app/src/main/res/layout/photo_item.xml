@@ -7,6 +7,7 @@
         <variable
             name="Photo"
             type="com.konovus.unsplashapiapp.models.Photo" />
+
     </data>
 
     <RelativeLayout
@@ -14,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_5sdp">
 
-        <com.makeramen.roundedimageview.RoundedImageView
+        <ImageView
             android:id="@+id/photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -22,8 +23,9 @@
             android:maxHeight="@dimen/_400sdp"
             android:scaleType="center"
             android:imageURL="@{Photo.urls.thumb}"
-            app:riv_corner_radius="@dimen/_5sdp"
-            android:layout_alignParentTop="true"/>
+            android:background="@drawable/photo_details_shape"
+            android:layout_alignParentTop="true"
+            android:transitionName="shared_transition"/>
 
         <com.makeramen.roundedimageview.RoundedImageView
             android:visibility="gone"
@@ -38,27 +40,6 @@
             android:layout_alignBottom="@id/photo"
             android:layout_alignStart="@id/photo"
             android:layout_alignEnd="@id/photo"/>
-
-
-        <ImageView
-            android:visibility="gone"
-            android:id="@+id/download_btn"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_32sdp"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/centerPoint"
-            app:riv_corner_radius="@dimen/_10sdp"
-            android:padding="@dimen/_8sdp"
-            android:src="@drawable/ic_arrow_download"
-            android:tint="@color/colorIcons"
-            android:background="@drawable/icons_bg_shape"/>
-
-        <TextView
-            android:id="@+id/centerPoint"
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="@dimen/_5sdp"
-            android:layout_centerInParent="true"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -89,47 +70,6 @@
                 app:layout_constraintLeft_toLeftOf="@id/progress_download"
                 app:layout_constraintRight_toRightOf="@id/progress_download"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        <ImageView
-            android:visibility="gone"
-            android:id="@+id/like_btn"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_32sdp"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_toLeftOf="@id/centerPoint"
-            app:riv_corner_radius="@dimen/_10sdp"
-            android:padding="@dimen/_8sdp"
-            android:src="@drawable/ic_favorite"
-            android:tint="@color/colorIcons"
-            android:background="@drawable/icons_bg_shape"/>
-        <com.makeramen.roundedimageview.RoundedImageView
-            android:visibility="gone"
-            android:id="@+id/profile_img"
-            android:layout_width="@dimen/_32sdp"
-            android:layout_height="@dimen/_32sdp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:imageURL="@{Photo.user.profileImage.small}"
-            android:layout_margin="@dimen/_24sdp"
-            app:riv_corner_radius="@dimen/_50sdp"
-            android:backgroundTint="@color/colorIcons"/>
-
-
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:textSize="@dimen/_18ssp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@{Photo.user.username}"
-            app:layout_constraintStart_toEndOf="@id/profile_img"
-            app:layout_constraintBottom_toBottomOf="@id/profile_img"/>
-
 
     </RelativeLayout>
 </layout>
