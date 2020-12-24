@@ -76,4 +76,7 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.github.MikeOrtiz:TouchImageView:3.0.1'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+//    FlipView
+    implementation 'com.wajahatkarim3.EasyFlipView:EasyFlipView:3.0.0'
+
 }

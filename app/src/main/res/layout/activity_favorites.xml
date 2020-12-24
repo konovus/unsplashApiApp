@@ -30,9 +30,9 @@
                 android:id="@+id/back_img"
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"
-                android:tint="#fff"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_back"/>
+                android:src="@drawable/ic_back"
+                app:tint="#fff" />
             <TextView
                 android:id="@+id/header_text"
                 android:layout_width="0dp"
@@ -51,6 +51,7 @@
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:visibility="invisible"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"

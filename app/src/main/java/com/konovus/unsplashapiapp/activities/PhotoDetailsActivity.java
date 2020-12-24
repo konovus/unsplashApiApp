@@ -1,5 +1,6 @@
 package com.konovus.unsplashapiapp.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
@@ -24,22 +25,25 @@ import com.konovus.unsplashapiapp.utils.CapturePhotoUtils;
 import com.konovus.unsplashapiapp.utils.GlideImageLoader;
 import com.konovus.unsplashapiapp.viewmodels.PhotoDetailsViewModel;
 
+import java.util.Objects;
+
 public class PhotoDetailsActivity extends AppCompatActivity {
 
     private ActivityPhotoDetailsBinding binding;
     private Photo photo;
     private PhotoDetailsViewModel viewModel;
     private boolean isLiked;
+
+    private final int flipDuration = 500;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_photo_details);
-
         doInitialization();
     }
 
-    private void doInitialization(){
+    private void doInitialization() {
         viewModel = new ViewModelProvider(this,
                 new ViewModelProvider.AndroidViewModelFactory(getApplication()))
                 .get(PhotoDetailsViewModel.class);
@@ -51,7 +55,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
 
         binding.likeBtn.setOnClickListener(v -> {
             CompositeDisposable compositeDisposable = new CompositeDisposable();
-            if(isLiked){
+            if (isLiked) {
                 compositeDisposable.add(viewModel.removeFromFavList(photo)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -73,21 +77,27 @@ public class PhotoDetailsActivity extends AppCompatActivity {
         });
 
         binding.downloadBtn.setOnClickListener(v -> {
-            CapturePhotoUtils.insertImage(getContentResolver(),
-                    GlideImageLoader.getBitmap(), photo.getId(), photo.getId()+photo.getUser().getName());
-            Toast.makeText(this, "Saved in Gallery", Toast.LENGTH_SHORT).show();
+            if (binding.photoFull.getDrawable() != null) {
+                CapturePhotoUtils.insertImage(getContentResolver(),
+                        GlideImageLoader.getBitmap(), photo.getId(), photo.getId() + photo.getUser().getName());
+                binding.downloadCheckBtn.setVisibility(View.VISIBLE);
+                binding.flipView.setFlipTypeFromLeft();
+                binding.flipView.flipTheView();
+                Toast.makeText(this, "Saved in Gallery", Toast.LENGTH_SHORT).show();
+            } else Toast.makeText(this, "Photo not loaded", Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void setupLayout(){
-        if(getIntent().hasExtra("photo"))
+    private void setupLayout() {
+        if (getIntent().hasExtra("photo"))
             photo = (Photo) getIntent().getSerializableExtra("photo");
         binding.setPhoto(photo);
-        RequestOptions options = new RequestOptions()
-                .priority(Priority.HIGH);
+
+        binding.flipView.setFlipDuration(flipDuration);
 
         new GlideImageLoader(binding.photo, binding.photoFull,
-                binding.progressBar, getContentResolver()).load(photo.getUrls().getFull(),options);
+                binding.progressBar, getContentResolver()).load(photo.getUrls().getFull()
+                , new RequestOptions().priority(Priority.HIGH));
 
         binding.likeBtn.postDelayed(() -> {
             binding.likeBtn.setVisibility(View.VISIBLE);
@@ -102,7 +112,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
         binding.downloadBtn.setVisibility(View.INVISIBLE);
     }
 
-    private void checkFavInFavList(){
+    private void checkFavInFavList() {
         CompositeDisposable compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(viewModel.getPhotoFromFavList(photo.getId())
                 .subscribeOn(Schedulers.computation())
@@ -114,14 +124,13 @@ public class PhotoDetailsActivity extends AppCompatActivity {
 //                Changing color for the icon (vector drawable)
                     binding.likeBtn.setColorFilter(ContextCompat.getColor(binding.likeBtn.getContext(), R.color.colorIconsBG), PorterDuff.Mode.SRC_IN);
                     binding.likeBtn.setTag("Fav");
-
                     compositeDisposable.dispose();
                 }));
 
     }
 
-    private void toggleFav(ImageView view){
-        if(view.getTag() == null || view.getTag().toString().isEmpty()){
+    private void toggleFav(ImageView view) {
+        if (view.getTag() == null || view.getTag().toString().isEmpty()) {
             view.setBackgroundResource(R.drawable.icons_fav_bg_shape);
 //                Changing color for the icon (vector drawable)
             view.setColorFilter(ContextCompat.getColor(view.getContext(), R.color.colorIconsBG), PorterDuff.Mode.SRC_IN);
@@ -131,17 +140,6 @@ public class PhotoDetailsActivity extends AppCompatActivity {
 //                Changing color for the icon (vector drawable)
             view.setColorFilter(ContextCompat.getColor(view.getContext(), R.color.colorIcons), PorterDuff.Mode.SRC_IN);
             view.setTag("");
-
         }
-    }
-    private void transitionSetup(){
-        Fade fade = new Fade();
-        View decor =  getWindow().getDecorView();
-        fade.excludeTarget(decor.findViewById(R.id.action_bar_container), true);
-        fade.excludeTarget(decor.findViewById(android.R.id.statusBarBackground), true);
-        fade.excludeTarget(decor.findViewById(android.R.id.navigationBarBackground), true);
-        fade.excludeTarget(decor.findViewById(android.R.id.background), true);
-        getWindow().setEnterTransition(fade);
-        getWindow().setExitTransition(fade);
     }
 }

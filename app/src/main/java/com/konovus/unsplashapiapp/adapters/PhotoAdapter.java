@@ -80,9 +80,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             photoItemBinding.photo.setClipToOutline(true);
             photoItemBinding.photo.setOnClickListener(v -> photoListener.onPhotoClicked(photo, v));
 
-//            photoItemBinding.downloadBtn.setOnClickListener(v -> {
-//                new MyAsyncTask(photoItemBinding, context, photo).execute(photo.getUrls().getFull());
-//            });
+
         }
     }
 

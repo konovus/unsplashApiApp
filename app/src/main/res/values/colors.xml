@@ -7,4 +7,5 @@
     <color name="colorIcons">#868686</color>
     <color name="colorCover">#26FFFFFF</color>
     <color name="colorFav">#D32F2F</color>
+    <color name="colorChecked">#388E3C</color>
 </resources>

@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-//        transitionSetup();
         doInitialization();
     }
 
