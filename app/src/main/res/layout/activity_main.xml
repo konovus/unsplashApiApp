@@ -55,7 +55,7 @@
                 android:imeOptions="actionDone"
                 android:importantForAutofill="no"
                 android:includeFontPadding="false"
-                android:inputType="text"
+                android:inputType="textNoSuggestions"
                 android:textColor="#fff"
                 android:textColorHint="@color/colorPrimary"
                 android:textSize="@dimen/_13ssp"/>
@@ -64,19 +64,17 @@
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:src="@drawable/ic_search"
-                android:tint="#fff"
                 android:padding="@dimen/_2sdp"
                 android:layout_marginRight="@dimen/_8sdp"
-                />
+                app:tint="#fff" />
             <ImageView
                 android:id="@+id/favourites_img"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:src="@drawable/ic_favorite"
-                android:tint="#fff"
                 android:padding="@dimen/_2sdp"
                 android:layout_marginRight="@dimen/_8sdp"
-                />
+                app:tint="#fff" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

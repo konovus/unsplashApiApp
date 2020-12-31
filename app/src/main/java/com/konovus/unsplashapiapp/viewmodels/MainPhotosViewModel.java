@@ -18,11 +18,11 @@ public class MainPhotosViewModel extends ViewModel {
         mainPhotosRepository = new MainPhotosRepository();
     }
 
-    public LiveData<List<Photo>> getMainPhotos(int page, String order_by, String client_id){
-        return mainPhotosRepository.getMainPhotos(page, order_by, client_id);
+    public LiveData<List<Photo>> getMainPhotos(int page, int per_page, String order_by, String client_id){
+        return mainPhotosRepository.getMainPhotos(page, per_page, order_by, client_id);
     }
 
-    public LiveData<SearchPhotoResponse> searchPhotos(int page, String query, String client_id){
-        return mainPhotosRepository.searchPhotos(page, query, client_id);
+    public LiveData<SearchPhotoResponse> searchPhotos(int page, int per_page, String query, String client_id){
+        return mainPhotosRepository.searchPhotos(page, per_page, query, client_id);
     }
 }

@@ -41,7 +41,9 @@
             app:layout_constraintTop_toTopOf="@id/photo"
             app:layout_constraintLeft_toLeftOf="@id/photo"
             app:layout_constraintRight_toRightOf="@id/photo"
-            android:transitionName="shared_transition" />
+            android:transitionName="shared_transition">
+            <tag android:id="@+id/zoomable" android:value="ZoomableViewTag" />
+        </com.github.chrisbanes.photoview.PhotoView>
         <ImageView
             android:visibility="invisible"
             android:id="@+id/like_btn"

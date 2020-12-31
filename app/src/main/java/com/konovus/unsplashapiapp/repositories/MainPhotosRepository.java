@@ -22,9 +22,9 @@ public class MainPhotosRepository {
         apiService = ApiClient.getRetrofit().create(ApiService.class);
     }
 
-    public LiveData<List<Photo>> getMainPhotos(int page, String order_by, String client_id){
+    public LiveData<List<Photo>> getMainPhotos(int page, int per_page, String order_by, String client_id){
         MutableLiveData<List<Photo>> photos = new MutableLiveData<>();
-        apiService.getPhotos(order_by, page, client_id).enqueue(new Callback<List<Photo>>() {
+        apiService.getPhotos(order_by, page, per_page, client_id).enqueue(new Callback<List<Photo>>() {
             @Override
             public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
                 photos.setValue(response.body());
@@ -38,9 +38,9 @@ public class MainPhotosRepository {
         return photos;
     }
 
-    public LiveData<SearchPhotoResponse> searchPhotos(int page, String query, String client_id){
+    public LiveData<SearchPhotoResponse> searchPhotos(int page, int per_page,String query, String client_id){
         MutableLiveData<SearchPhotoResponse> photosResponse = new MutableLiveData<>();
-        apiService.searchPhotos(query, page, client_id).enqueue(new Callback<SearchPhotoResponse>() {
+        apiService.searchPhotos(query, page, per_page, client_id).enqueue(new Callback<SearchPhotoResponse>() {
             @Override
             public void onResponse(Call<SearchPhotoResponse> call, Response<SearchPhotoResponse> response) {
                 photosResponse.setValue(response.body());

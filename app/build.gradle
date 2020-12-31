@@ -78,5 +78,7 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 //    FlipView
     implementation 'com.wajahatkarim3.EasyFlipView:EasyFlipView:3.0.0'
+//  Pinch to zoom library
+    implementation 'com.aghajari.zoomhelper:ZoomHelper:1.0.1'
 
 }

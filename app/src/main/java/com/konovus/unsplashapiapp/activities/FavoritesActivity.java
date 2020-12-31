@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.konovus.unsplashapiapp.activities.PhotoDetailsActivity.isFavListUpdated;
+
 public class FavoritesActivity extends AppCompatActivity implements PhotoAdapter.PhotoListener {
 
     private ActivityFavoritesBinding binding;
@@ -31,6 +33,7 @@ public class FavoritesActivity extends AppCompatActivity implements PhotoAdapter
     private List<Photo> favlist;
     private PhotoAdapter adapter;
     private int currentPage = 1;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +73,20 @@ public class FavoritesActivity extends AppCompatActivity implements PhotoAdapter
                     compositeDisposable.dispose();
                 }));
     }
+
     @Override
-    public void onPhotoClicked(Photo photo, View view) {
+    protected void onResume() {
+        super.onResume();
+        if(isFavListUpdated && position >= 0){
+            favlist.remove(position);
+            adapter.setPhotos(favlist, position);
+            isFavListUpdated = false;
+        }
+    }
+
+    @Override
+    public void onPhotoClicked(Photo photo, View view, int position) {
+        this.position = position;
         Intent intent = new Intent(this, PhotoDetailsActivity.class);
         intent.putExtra("photo", photo);
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat

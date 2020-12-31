@@ -14,10 +14,12 @@ public interface ApiService {
     @GET("photos")
     Call<List<Photo>> getPhotos(@Query("order_by") String order_by,
                                 @Query("page") int page,
+                                @Query("per_page") int per_page,
                                 @Query("client_id") String client_id);
 
     @GET("search/photos")
     Call<SearchPhotoResponse> searchPhotos(@Query("query") String query,
                                            @Query("page") int page,
+                                           @Query("per_page") int per_page,
                                            @Query("client_id") String client_id);
 }

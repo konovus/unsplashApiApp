@@ -2,6 +2,7 @@ package com.konovus.unsplashapiapp.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,13 +10,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.transition.Fade;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.aghajari.zoomhelper.ZoomHelper;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
 import com.konovus.unsplashapiapp.R;
@@ -33,6 +39,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
     private Photo photo;
     private PhotoDetailsViewModel viewModel;
     private boolean isLiked;
+    public static boolean isFavListUpdated;
 
     private final int flipDuration = 500;
 
@@ -61,6 +68,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
                             isLiked = false;
+                            isFavListUpdated = true;
                             toggleFav((ImageView) v);
                             Toast.makeText(this, "Removed from Favorites", Toast.LENGTH_SHORT).show();
                             compositeDisposable.dispose();
@@ -77,14 +85,14 @@ public class PhotoDetailsActivity extends AppCompatActivity {
         });
 
         binding.downloadBtn.setOnClickListener(v -> {
-            if (binding.photoFull.getDrawable() != null) {
-                CapturePhotoUtils.insertImage(getContentResolver(),
-                        GlideImageLoader.getBitmap(), photo.getId(), photo.getId() + photo.getUser().getName());
-                binding.downloadCheckBtn.setVisibility(View.VISIBLE);
-                binding.flipView.setFlipTypeFromLeft();
-                binding.flipView.flipTheView();
-                Toast.makeText(this, "Saved in Gallery", Toast.LENGTH_SHORT).show();
-            } else Toast.makeText(this, "Photo not loaded", Toast.LENGTH_SHORT).show();
+
+            if(ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(PhotoDetailsActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            } else saveInGallery();
         });
     }
 
@@ -92,7 +100,6 @@ public class PhotoDetailsActivity extends AppCompatActivity {
         if (getIntent().hasExtra("photo"))
             photo = (Photo) getIntent().getSerializableExtra("photo");
         binding.setPhoto(photo);
-
         binding.flipView.setFlipDuration(flipDuration);
 
         new GlideImageLoader(binding.photo, binding.photoFull,
@@ -103,6 +110,11 @@ public class PhotoDetailsActivity extends AppCompatActivity {
             binding.likeBtn.setVisibility(View.VISIBLE);
             binding.downloadBtn.setVisibility(View.VISIBLE);
         }, 300);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return ZoomHelper.Companion.getInstance().dispatchTouchEvent(ev,this) || super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -127,6 +139,28 @@ public class PhotoDetailsActivity extends AppCompatActivity {
                     compositeDisposable.dispose();
                 }));
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
+            saveInGallery();
+        }
+    }
+
+    private void saveInGallery(){
+        if (binding.photoFull.getDrawable() != null) {
+            CapturePhotoUtils.insertImage(getContentResolver(),
+                    GlideImageLoader.getBitmap(), photo.getId(), photo.getId() + photo.getUser().getName());
+            binding.downloadCheckBtn.setVisibility(View.VISIBLE);
+            binding.flipView.setFlipTypeFromLeft();
+            binding.flipView.flipTheView();
+            Toast.makeText(this, "Saved in Gallery", Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(this, "Photo not loaded", Toast.LENGTH_SHORT).show();
     }
 
     private void toggleFav(ImageView view) {

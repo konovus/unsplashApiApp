@@ -3,6 +3,7 @@ package com.konovus.unsplashapiapp.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     private void doInitialization(){
         mainPhotosViewModel = new ViewModelProvider(this).get(MainPhotosViewModel.class);
         photoAdapter = new PhotoAdapter(photos, this, this);
-        activityMainBinding.recyclerView.setItemViewCacheSize(1000);
+        activityMainBinding.recyclerView.setItemViewCacheSize(200);
         activityMainBinding.recyclerView.setHasFixedSize(true);
         activityMainBinding.recyclerView.setAdapter(photoAdapter);
         activityMainBinding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
@@ -122,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                                     totalPages = 1;
                                     search_photos.clear();
                                     searchPhotos(query);
+                                    activityMainBinding.recyclerView.smoothScrollToPosition(0);
+
                                 }
                             });
                         }
@@ -132,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                     photos.clear();
                     search_photos.clear();
                     getMainPhotos();
+                    activityMainBinding.recyclerView.smoothScrollToPosition(0);
                 }
             }
         });
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     private void searchPhotos(String query) {
         isSearch = true;
         toggleLoading();
-        mainPhotosViewModel.searchPhotos(currentPage, query, "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
+        mainPhotosViewModel.searchPhotos(currentPage, 20, query, "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
                 .observe(this, new Observer<SearchPhotoResponse>() {
             @Override
             public void onChanged(SearchPhotoResponse searchPhotoResponse) {
@@ -150,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                     int oldCount = search_photos.size();
                     search_photos.addAll(searchPhotoResponse.getResults());
                     if(oldCount == 0)
-                        photoAdapter.setPhotos(search_photos);
+                        photoAdapter.setPhotos(search_photos, null);
                     else
                         photoAdapter.notifyItemRangeInserted(oldCount, search_photos.size());
                 } else Toast.makeText(MainActivity.this, "No results found", Toast.LENGTH_LONG).show();
@@ -159,14 +163,14 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     }
     private void getMainPhotos(){
         toggleLoading();
-        mainPhotosViewModel.getMainPhotos(currentPage, "popular", "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
+        mainPhotosViewModel.getMainPhotos(currentPage, 20, "latest", "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
                 .observe(this, photosResponse ->{
             toggleLoading();
             if(photosResponse != null && !photosResponse.isEmpty()){
                 int oldCount = photos.size();
                 photos.addAll(photosResponse);
                 if(oldCount == 0)
-                    photoAdapter.setPhotos(photos);
+                    photoAdapter.setPhotos(photos, null);
                 else
                     photoAdapter.notifyItemRangeInserted(oldCount, oldCount+=10);
             } else Toast.makeText(MainActivity.this, "No results found", Toast.LENGTH_LONG).show();
@@ -188,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     }
 
     @Override
-    public void onPhotoClicked(Photo photo, View view) {
+    public void onPhotoClicked(Photo photo, View view, int position) {
         Intent intent = new Intent(MainActivity.this, PhotoDetailsActivity.class);
         intent.putExtra("photo", photo);
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
