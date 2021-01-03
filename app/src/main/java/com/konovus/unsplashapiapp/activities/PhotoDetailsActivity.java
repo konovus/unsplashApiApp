@@ -11,6 +11,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -29,8 +30,11 @@ import com.konovus.unsplashapiapp.databinding.ActivityPhotoDetailsBinding;
 import com.konovus.unsplashapiapp.models.Photo;
 import com.konovus.unsplashapiapp.utils.CapturePhotoUtils;
 import com.konovus.unsplashapiapp.utils.GlideImageLoader;
+import com.konovus.unsplashapiapp.utils.OnSwipeTouchListener;
 import com.konovus.unsplashapiapp.viewmodels.PhotoDetailsViewModel;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 public class PhotoDetailsActivity extends AppCompatActivity {
@@ -94,8 +98,45 @@ public class PhotoDetailsActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             } else saveInGallery();
         });
-    }
 
+        binding.photoFull.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeLeft() {
+                setupOnSwipeIntent(1);
+            }
+            @Override
+            public void onSwipeRight() {
+                setupOnSwipeIntent(0);
+            }
+        });
+
+        binding.photo.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeLeft() {
+                setupOnSwipeIntent(1);
+            }
+            @Override
+            public void onSwipeRight() {
+                setupOnSwipeIntent(0);
+            }
+        });
+
+    }
+    private void setupOnSwipeIntent(int side){
+        Intent intent = new Intent(PhotoDetailsActivity.this, PhotoDetailsActivity.class);
+        List<Photo> photos = (List<Photo>) getIntent().getSerializableExtra("photos");
+        int pos = getIntent().getIntExtra("pos", 0);
+        if(side == 1) {
+            intent.putExtra("pos", pos + 1);
+            intent.putExtra("photo", photos.get(pos + 1));
+        } else {
+            intent.putExtra("pos", pos - 1);
+            intent.putExtra("photo", photos.get(pos - 1));
+        }
+        intent.putExtra("photos", (Serializable) photos);
+        startActivity(intent);
+        finish();
+    }
     private void setupLayout() {
         if (getIntent().hasExtra("photo"))
             photo = (Photo) getIntent().getSerializableExtra("photo");
