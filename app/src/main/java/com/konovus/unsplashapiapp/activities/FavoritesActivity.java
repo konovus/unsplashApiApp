@@ -65,7 +65,7 @@ public class FavoritesActivity extends AppCompatActivity implements PhotoAdapter
                     Collections.reverse(photos);
                     favlist.addAll(photos);
                     adapter = new PhotoAdapter(favlist, this, this);
-                    binding.recyclerView.setItemViewCacheSize(1000);
+                    binding.recyclerView.setItemViewCacheSize(200);
                     binding.recyclerView.setHasFixedSize(true);
                     binding.recyclerView.setAdapter(adapter);
                     binding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
@@ -77,7 +77,7 @@ public class FavoritesActivity extends AppCompatActivity implements PhotoAdapter
     @Override
     protected void onResume() {
         super.onResume();
-        if(isFavListUpdated && position >= 0){
+        if(isFavListUpdated && position >= 0 && !favlist.isEmpty()){
             favlist.remove(position);
             adapter.setPhotos(favlist, position);
             isFavListUpdated = false;

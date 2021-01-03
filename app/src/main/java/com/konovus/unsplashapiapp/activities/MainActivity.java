@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -20,6 +21,8 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Fade;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -62,7 +65,8 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
         activityMainBinding.recyclerView.setItemViewCacheSize(200);
         activityMainBinding.recyclerView.setHasFixedSize(true);
         activityMainBinding.recyclerView.setAdapter(photoAdapter);
-        activityMainBinding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        activityMainBinding.recyclerView.setLayoutManager(new WrapStaggeredLayout(2, StaggeredGridLayoutManager.VERTICAL));
+//        activityMainBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         activityMainBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -74,6 +78,12 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                     else
                         searchPhotos(query);
                 }
+                if(recyclerView.canScrollVertically(1))
+                    if(activityMainBinding.getIsLoadingMore() || activityMainBinding.getIsLoading()) {
+                        activityMainBinding.setIsLoadingMore(false);
+                        activityMainBinding.setIsLoading(false);
+                    }
+
             }
         });
         activityMainBinding.favouritesImg.setOnClickListener(v -> startActivity(new Intent(this, FavoritesActivity.class)));
@@ -123,8 +133,6 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                                     totalPages = 1;
                                     search_photos.clear();
                                     searchPhotos(query);
-                                    activityMainBinding.recyclerView.smoothScrollToPosition(0);
-
                                 }
                             });
                         }
@@ -135,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
                     photos.clear();
                     search_photos.clear();
                     getMainPhotos();
-                    activityMainBinding.recyclerView.smoothScrollToPosition(0);
                 }
             }
         });
@@ -146,16 +153,17 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
         toggleLoading();
         mainPhotosViewModel.searchPhotos(currentPage, 20, query, "CYn6YcuwIT4PsQPnKT656mLrfDBQCR_37tZk8JTry5k")
                 .observe(this, new Observer<SearchPhotoResponse>() {
-            @Override
+                @Override
             public void onChanged(SearchPhotoResponse searchPhotoResponse) {
                 toggleLoading();
                 if (searchPhotoResponse != null) {
                     totalPages = searchPhotoResponse.getTotal_pages();
                     int oldCount = search_photos.size();
                     search_photos.addAll(searchPhotoResponse.getResults());
-                    if(oldCount == 0)
+                    if(oldCount == 0) {
                         photoAdapter.setPhotos(search_photos, null);
-                    else
+                        activityMainBinding.recyclerView.smoothScrollToPosition(0);
+                    } else
                         photoAdapter.notifyItemRangeInserted(oldCount, search_photos.size());
                 } else Toast.makeText(MainActivity.this, "No results found", Toast.LENGTH_LONG).show();
             }
@@ -169,10 +177,11 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
             if(photosResponse != null && !photosResponse.isEmpty()){
                 int oldCount = photos.size();
                 photos.addAll(photosResponse);
-                if(oldCount == 0)
+                if(oldCount == 0) {
                     photoAdapter.setPhotos(photos, null);
-                else
-                    photoAdapter.notifyItemRangeInserted(oldCount, oldCount+=10);
+                    activityMainBinding.recyclerView.smoothScrollToPosition(0);
+                } else
+                    photoAdapter.notifyItemRangeInserted(oldCount, oldCount+=20);
             } else Toast.makeText(MainActivity.this, "No results found", Toast.LENGTH_LONG).show();
         });
     }
@@ -211,14 +220,21 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    private void transitionSetup(){
-        Fade fade = new Fade();
-        View decor =  getWindow().getDecorView();
-        fade.excludeTarget(decor.findViewById(R.id.action_bar_container), true);
-        fade.excludeTarget(decor.findViewById(android.R.id.statusBarBackground), true);
-        fade.excludeTarget(decor.findViewById(android.R.id.navigationBarBackground), true);
-        fade.excludeTarget(decor.findViewById(android.R.id.background), true);
-        getWindow().setEnterTransition(fade);
-        getWindow().setExitTransition(fade);
+    private class WrapStaggeredLayout extends StaggeredGridLayoutManager{
+
+
+        public WrapStaggeredLayout(int spanCount, int orientation) {
+            super(spanCount, orientation);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+                Log.e("TAG", "IndexOutOfBoundsException in RecyclerView");
+            }
+        }
     }
 }
+

@@ -67,10 +67,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         void onPhotoClicked(Photo photo, View view, int position);
     }
 
-    public void setPhotos(List<Photo> photos, Integer pos){
-        int currentSize = this.photos.size();
-        this.photos.clear();
-        this.photos.addAll(photos);
+    public void setPhotos(List<Photo> new_photos, Integer pos){
+        int currentSize = photos.size();
+        this.photos = new_photos;
         if(pos != null){
             notifyItemRemoved(pos);
             notifyItemRangeChanged(pos, getItemCount());
@@ -78,7 +77,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             //tell the recycler view that all the old items are gone
             notifyItemRangeRemoved(0, currentSize);
             //tell the recycler view how many new items we added
-            notifyItemRangeInserted(0, photos.size());
+            notifyItemRangeInserted(0, new_photos.size());
         }
     }
 
