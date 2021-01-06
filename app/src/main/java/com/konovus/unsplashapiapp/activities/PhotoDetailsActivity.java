@@ -11,6 +11,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
@@ -54,6 +55,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
         doInitialization();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void doInitialization() {
         viewModel = new ViewModelProvider(this,
                 new ViewModelProvider.AndroidViewModelFactory(getApplication()))
@@ -134,8 +136,8 @@ public class PhotoDetailsActivity extends AppCompatActivity {
             intent.putExtra("photo", photos.get(pos - 1));
         }
         intent.putExtra("photos", (Serializable) photos);
-        startActivity(intent);
         finish();
+        startActivity(intent);
     }
     private void setupLayout() {
         if (getIntent().hasExtra("photo"))

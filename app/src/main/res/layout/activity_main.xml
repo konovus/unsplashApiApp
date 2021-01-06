@@ -66,7 +66,8 @@
                 android:src="@drawable/ic_search"
                 android:padding="@dimen/_2sdp"
                 android:layout_marginRight="@dimen/_8sdp"
-                app:tint="#fff" />
+                app:tint="#fff"
+                />
             <ImageView
                 android:id="@+id/favourites_img"
                 android:layout_width="@dimen/_24sdp"
