@@ -12,9 +12,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.konovus.unsplashapiapp.R;
 
 import androidx.annotation.Nullable;
 
@@ -22,16 +24,16 @@ import androidx.annotation.Nullable;
 public class GlideImageLoader {
 
     private ImageView mImageView;
-    private ImageView mImageViewFull;
     private ProgressBar mProgressBar;
     private static Bitmap bitmap;
     private ContentResolver cr;
+    private String thumb;
 
-    public GlideImageLoader(ImageView imageView,ImageView mImageViewFull, ProgressBar progressBar, ContentResolver cr) {
+    public GlideImageLoader(ImageView imageView, ProgressBar progressBar, ContentResolver cr, String thumb) {
         mImageView = imageView;
-        this.mImageViewFull = mImageViewFull;
         mProgressBar = progressBar;
         this.cr = cr;
+        this.thumb = thumb;
     }
 
     public static Bitmap getBitmap(){
@@ -58,9 +60,12 @@ public class GlideImageLoader {
             }
         });
         //Get Image
-        Glide.with(mImageViewFull.getContext())
+        Glide.with(mImageView.getContext())
                 .load(url)
-                .apply(options.diskCacheStrategy(DiskCacheStrategy.RESOURCE))
+                .apply(options.diskCacheStrategy(DiskCacheStrategy.ALL))
+                .thumbnail(Glide.with(mImageView.getContext())
+                                .load(thumb)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL))
                 .listener(new RequestListener<Drawable>() {
 
                     @Override
@@ -72,25 +77,16 @@ public class GlideImageLoader {
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-
+                        mImageView.setTag("isReady");
                         bitmap = ((BitmapDrawable) resource).getBitmap();
-                        mImageViewFull.animate().alpha(1f).setDuration(300).setStartDelay(300).withEndAction(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mProgressBar.setVisibility(View.INVISIBLE);
-                                        mImageView.setVisibility(View.INVISIBLE);
-                                        mImageViewFull.setVisibility(View.VISIBLE);
-                                        mImageViewFull.setClipToOutline(true);
-                                    }
-                                }
-                        ).start();
+                        mImageView.setClipToOutline(true);
                         ProgressAppGlideModule.forget(url);
-//                        onFinished();
+                        onFinished();
                         return false;
                     }
                 })
-                .into(mImageViewFull);
+                .placeholder(R.color.colorIcons)
+                .into(mImageView);
     }
 
 
@@ -101,7 +97,7 @@ public class GlideImageLoader {
     private void onFinished() {
         if (mProgressBar != null && mImageView != null) {
             mProgressBar.setVisibility(View.GONE);
-            mImageViewFull.setVisibility(View.VISIBLE);
+            mImageView.setVisibility(View.VISIBLE);
         }
     }
 }

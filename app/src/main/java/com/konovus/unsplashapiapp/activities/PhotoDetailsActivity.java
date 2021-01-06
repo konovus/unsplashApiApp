@@ -31,6 +31,7 @@ import com.konovus.unsplashapiapp.utils.CapturePhotoUtils;
 import com.konovus.unsplashapiapp.utils.GlideImageLoader;
 import com.konovus.unsplashapiapp.viewmodels.PhotoDetailsViewModel;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class PhotoDetailsActivity extends AppCompatActivity {
@@ -99,11 +100,14 @@ public class PhotoDetailsActivity extends AppCompatActivity {
     private void setupLayout() {
         if (getIntent().hasExtra("photo"))
             photo = (Photo) getIntent().getSerializableExtra("photo");
+
+
         binding.setPhoto(photo);
         binding.flipView.setFlipDuration(flipDuration);
 
-        new GlideImageLoader(binding.photo, binding.photoFull,
-                binding.progressBar, getContentResolver()).load(photo.getUrls().getFull()
+        new GlideImageLoader(binding.photo, binding.progressBar,
+                getContentResolver(), photo.getUrls().getThumb())
+                .load(photo.getUrls().getFull()
                 , new RequestOptions().priority(Priority.HIGH));
 
         binding.likeBtn.postDelayed(() -> {
@@ -153,7 +157,7 @@ public class PhotoDetailsActivity extends AppCompatActivity {
     }
 
     private void saveInGallery(){
-        if (binding.photoFull.getDrawable() != null) {
+        if (binding.photo.getTag() != null ) {
             CapturePhotoUtils.insertImage(getContentResolver(),
                     GlideImageLoader.getBitmap(), photo.getId(), photo.getId() + photo.getUser().getName());
             binding.downloadCheckBtn.setVisibility(View.VISIBLE);

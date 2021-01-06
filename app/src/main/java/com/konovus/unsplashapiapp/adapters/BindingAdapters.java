@@ -28,6 +28,7 @@ public class BindingAdapters {
                     new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            imageView.setAlpha(1f);
                             return false;
                         }
 
