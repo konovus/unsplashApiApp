@@ -18,7 +18,14 @@
         android:background="@drawable/photo_details_shape"
         tools:context=".activities.PhotoDetailsActivity">
 
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
         <com.github.chrisbanes.photoview.PhotoView
+            android:visibility="gone"
             android:id="@+id/photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

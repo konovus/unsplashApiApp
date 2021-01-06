@@ -25,12 +25,14 @@ import com.aghajari.zoomhelper.ZoomHelper;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
 import com.konovus.unsplashapiapp.R;
+import com.konovus.unsplashapiapp.adapters.Pager;
 import com.konovus.unsplashapiapp.databinding.ActivityPhotoDetailsBinding;
 import com.konovus.unsplashapiapp.models.Photo;
 import com.konovus.unsplashapiapp.utils.CapturePhotoUtils;
 import com.konovus.unsplashapiapp.utils.GlideImageLoader;
 import com.konovus.unsplashapiapp.viewmodels.PhotoDetailsViewModel;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class PhotoDetailsActivity extends AppCompatActivity {
@@ -99,12 +101,16 @@ public class PhotoDetailsActivity extends AppCompatActivity {
     private void setupLayout() {
         if (getIntent().hasExtra("photo"))
             photo = (Photo) getIntent().getSerializableExtra("photo");
-        binding.setPhoto(photo);
-        binding.flipView.setFlipDuration(flipDuration);
 
-        new GlideImageLoader(binding.photo, binding.photoFull,
-                binding.progressBar, getContentResolver()).load(photo.getUrls().getFull()
-                , new RequestOptions().priority(Priority.HIGH));
+        Pager pager = new Pager(this, (ArrayList<Photo>) getIntent().getSerializableExtra("photos")
+                                , getIntent().getIntExtra("pos", 0));
+        binding.viewPager.setAdapter(pager);
+//        binding.setPhoto(photo);
+//        binding.flipView.setFlipDuration(flipDuration);
+
+//        new GlideImageLoader(binding.photo, binding.photoFull,
+//                binding.progressBar, getContentResolver()).load(photo.getUrls().getFull()
+//                , new RequestOptions().priority(Priority.HIGH));
 
         binding.likeBtn.postDelayed(() -> {
             binding.likeBtn.setVisibility(View.VISIBLE);

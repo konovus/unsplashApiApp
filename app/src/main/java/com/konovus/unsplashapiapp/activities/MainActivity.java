@@ -34,6 +34,7 @@ import com.konovus.unsplashapiapp.models.Photo;
 import com.konovus.unsplashapiapp.responses.SearchPhotoResponse;
 import com.konovus.unsplashapiapp.viewmodels.MainPhotosViewModel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -204,6 +205,8 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     public void onPhotoClicked(Photo photo, View view, int position) {
         Intent intent = new Intent(MainActivity.this, PhotoDetailsActivity.class);
         intent.putExtra("photo", photo);
+        intent.putExtra("photos", (Serializable) photos);
+        intent.putExtra("pos", position);
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
                 .makeSceneTransitionAnimation(MainActivity.this, view, ViewCompat.getTransitionName(view));
         startActivity(intent, optionsCompat.toBundle());
