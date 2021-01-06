@@ -34,6 +34,7 @@ import com.konovus.unsplashapiapp.models.Photo;
 import com.konovus.unsplashapiapp.responses.SearchPhotoResponse;
 import com.konovus.unsplashapiapp.viewmodels.MainPhotosViewModel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
         activityMainBinding.recyclerView.setHasFixedSize(true);
         activityMainBinding.recyclerView.setAdapter(photoAdapter);
         activityMainBinding.recyclerView.setLayoutManager(new WrapStaggeredLayout(2, StaggeredGridLayoutManager.VERTICAL));
-//        activityMainBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         activityMainBinding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -204,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements PhotoAdapter.Phot
     public void onPhotoClicked(Photo photo, View view, int position) {
         Intent intent = new Intent(MainActivity.this, PhotoDetailsActivity.class);
         intent.putExtra("photo", photo);
+        intent.putExtra("pos", position);
+        intent.putExtra("photos", (Serializable) photos);
+
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
                 .makeSceneTransitionAnimation(MainActivity.this, view, ViewCompat.getTransitionName(view));
         startActivity(intent, optionsCompat.toBundle());
