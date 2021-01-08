@@ -60,7 +60,7 @@ public class GlideImageLoader {
         //Get Image
         Glide.with(mImageViewFull.getContext())
                 .load(url)
-                .apply(options.diskCacheStrategy(DiskCacheStrategy.RESOURCE))
+                .apply(options.diskCacheStrategy(DiskCacheStrategy.ALL))
                 .listener(new RequestListener<Drawable>() {
 
                     @Override

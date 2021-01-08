@@ -32,6 +32,7 @@ import com.konovus.unsplashapiapp.utils.CapturePhotoUtils;
 import com.konovus.unsplashapiapp.utils.GlideImageLoader;
 import com.konovus.unsplashapiapp.viewmodels.PhotoDetailsViewModel;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -58,44 +59,45 @@ public class PhotoDetailsActivity extends AppCompatActivity {
                 .get(PhotoDetailsViewModel.class);
 
         setupLayout();
-        checkFavInFavList();
+//        checkFavInFavList();
 
         binding.wrapperLayout.setOnClickListener(v -> onBackPressed());
 
-        binding.likeBtn.setOnClickListener(v -> {
-            CompositeDisposable compositeDisposable = new CompositeDisposable();
-            if (isLiked) {
-                compositeDisposable.add(viewModel.removeFromFavList(photo)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> {
-                            isLiked = false;
-                            isFavListUpdated = true;
-                            toggleFav((ImageView) v);
-                            Toast.makeText(this, "Removed from Favorites", Toast.LENGTH_SHORT).show();
-                            compositeDisposable.dispose();
-                        }));
-            } else {
-                compositeDisposable.add(viewModel.addToFavList(photo)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> {
-                            toggleFav((ImageView) v);
-                            compositeDisposable.dispose();
-                        }));
-            }
-        });
-
-        binding.downloadBtn.setOnClickListener(v -> {
-
-            if(ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(PhotoDetailsActivity.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            } else saveInGallery();
-        });
+//        binding.likeBtn.setOnClickListener(v -> {
+//            CompositeDisposable compositeDisposable = new CompositeDisposable();
+//            if (isLiked) {
+//                compositeDisposable.add(viewModel.removeFromFavList(photo)
+//                        .subscribeOn(Schedulers.computation())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(() -> {
+//                            isLiked = false;
+//                            isFavListUpdated = true;
+//                            toggleFav((ImageView) v);
+//                            Toast.makeText(this, "Removed from Favorites", Toast.LENGTH_SHORT).show();
+//                            compositeDisposable.dispose();
+//                        }));
+//            } else {
+//                compositeDisposable.add(viewModel.addToFavList(photo)
+//                        .subscribeOn(Schedulers.computation())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(() -> {
+//                            toggleFav((ImageView) v);
+//                            compositeDisposable.dispose();
+//                        }));
+//            }
+//        });
+//
+//        binding.downloadBtn.setOnClickListener(v -> {
+//
+//            if(ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+//                    != PackageManager.PERMISSION_GRANTED ||
+//                    ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                            != PackageManager.PERMISSION_GRANTED){
+//                ActivityCompat.requestPermissions(PhotoDetailsActivity.this,
+//                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//            } else System.out.println("");
+////                saveInGallery();
+//        });
     }
 
     private void setupLayout() {
@@ -104,7 +106,10 @@ public class PhotoDetailsActivity extends AppCompatActivity {
 
         Pager pager = new Pager(this, (ArrayList<Photo>) getIntent().getSerializableExtra("photos")
                                 , getIntent().getIntExtra("pos", 0));
+
         binding.viewPager.setAdapter(pager);
+        binding.viewPager.setOffscreenPageLimit(3);
+        binding.viewPager.setPageMargin(50);
 //        binding.setPhoto(photo);
 //        binding.flipView.setFlipDuration(flipDuration);
 
@@ -112,10 +117,10 @@ public class PhotoDetailsActivity extends AppCompatActivity {
 //                binding.progressBar, getContentResolver()).load(photo.getUrls().getFull()
 //                , new RequestOptions().priority(Priority.HIGH));
 
-        binding.likeBtn.postDelayed(() -> {
-            binding.likeBtn.setVisibility(View.VISIBLE);
-            binding.downloadBtn.setVisibility(View.VISIBLE);
-        }, 300);
+//        binding.likeBtn.postDelayed(() -> {
+//            binding.likeBtn.setVisibility(View.VISIBLE);
+//            binding.downloadBtn.setVisibility(View.VISIBLE);
+//        }, 300);
     }
 
     @Override
@@ -126,8 +131,8 @@ public class PhotoDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        binding.likeBtn.setVisibility(View.INVISIBLE);
-        binding.downloadBtn.setVisibility(View.INVISIBLE);
+//        binding.likeBtn.setVisibility(View.INVISIBLE);
+//        binding.downloadBtn.setVisibility(View.INVISIBLE);
     }
 
     private void checkFavInFavList() {
@@ -138,10 +143,10 @@ public class PhotoDetailsActivity extends AppCompatActivity {
                 .subscribe(photo -> {
                     isLiked = true;
 
-                    binding.likeBtn.setBackgroundResource(R.drawable.icons_fav_bg_shape);
-//                Changing color for the icon (vector drawable)
-                    binding.likeBtn.setColorFilter(ContextCompat.getColor(binding.likeBtn.getContext(), R.color.colorIconsBG), PorterDuff.Mode.SRC_IN);
-                    binding.likeBtn.setTag("Fav");
+//                    binding.likeBtn.setBackgroundResource(R.drawable.icons_fav_bg_shape);
+////                Changing color for the icon (vector drawable)
+//                    binding.likeBtn.setColorFilter(ContextCompat.getColor(binding.likeBtn.getContext(), R.color.colorIconsBG), PorterDuff.Mode.SRC_IN);
+//                    binding.likeBtn.setTag("Fav");
                     compositeDisposable.dispose();
                 }));
 
@@ -154,20 +159,20 @@ public class PhotoDetailsActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(PhotoDetailsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
-            saveInGallery();
+//            saveInGallery();
         }
     }
 
-    private void saveInGallery(){
-        if (binding.photoFull.getDrawable() != null) {
-            CapturePhotoUtils.insertImage(getContentResolver(),
-                    GlideImageLoader.getBitmap(), photo.getId(), photo.getId() + photo.getUser().getName());
-            binding.downloadCheckBtn.setVisibility(View.VISIBLE);
-            binding.flipView.setFlipTypeFromLeft();
-            binding.flipView.flipTheView();
-            Toast.makeText(this, "Saved in Gallery", Toast.LENGTH_SHORT).show();
-        } else Toast.makeText(this, "Photo not loaded", Toast.LENGTH_SHORT).show();
-    }
+//    private void saveInGallery(){
+//        if (binding.photoFull.getDrawable() != null) {
+//            CapturePhotoUtils.insertImage(getContentResolver(),
+//                    GlideImageLoader.getBitmap(), photo.getId(), photo.getId() + photo.getUser().getName());
+//            binding.downloadCheckBtn.setVisibility(View.VISIBLE);
+//            binding.flipView.setFlipTypeFromLeft();
+//            binding.flipView.flipTheView();
+//            Toast.makeText(this, "Saved in Gallery", Toast.LENGTH_SHORT).show();
+//        } else Toast.makeText(this, "Photo not loaded", Toast.LENGTH_SHORT).show();
+//    }
 
     private void toggleFav(ImageView view) {
         if (view.getTag() == null || view.getTag().toString().isEmpty()) {

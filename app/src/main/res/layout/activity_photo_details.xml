@@ -18,105 +18,15 @@
         android:background="@drawable/photo_details_shape"
         tools:context=".activities.PhotoDetailsActivity">
 
+
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-
-        <com.github.chrisbanes.photoview.PhotoView
-            android:visibility="gone"
-            android:id="@+id/photo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imageURL="@{Photo.urls.thumb}"
-            android:maxHeight="@dimen/_400sdp"
-            android:minHeight="@dimen/_100sdp"
-            android:scaleType="center"
-            android:background="@drawable/photo_details_shape"
+            android:layout_height="match_parent"
+            android:transitionName="shared_transition"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:transitionName="shared_transition" />
-        <com.github.chrisbanes.photoview.PhotoView
-            android:visibility="invisible"
-            android:id="@+id/photoFull"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:scaleType="center"
-            android:background="@drawable/photo_details_shape"
-            app:layout_constraintBottom_toBottomOf="@id/photo"
-            app:layout_constraintTop_toTopOf="@id/photo"
-            app:layout_constraintLeft_toLeftOf="@id/photo"
-            app:layout_constraintRight_toRightOf="@id/photo"
-            android:transitionName="shared_transition">
-            <tag android:id="@+id/zoomable" android:value="ZoomableViewTag" />
-        </com.github.chrisbanes.photoview.PhotoView>
-        <ImageView
-            android:visibility="invisible"
-            android:id="@+id/like_btn"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_32sdp"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_marginHorizontal="@dimen/_5sdp"
-            app:layout_constraintBottom_toBottomOf="@id/photo"
-            app:layout_constraintEnd_toStartOf="@id/flipView"
-            app:riv_corner_radius="@dimen/_10sdp"
-            android:padding="@dimen/_8sdp"
-            android:src="@drawable/ic_favorite"
-            android:background="@drawable/icons_bg_shape"
-            app:tint="@color/colorIcons" />
-        <com.wajahatkarim3.easyflipview.EasyFlipView
-            android:id="@+id/flipView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:flipOnTouch="true"
-            app:flipEnabled="true"
-            app:flipDuration="400"
-            app:flipFrom="left"
-            app:flipType="horizontal"
-            app:autoFlipBack="false"
-            app:layout_constraintBottom_toBottomOf="@id/photo"
-            app:layout_constraintEnd_toEndOf="@id/photo"
-            >
-            <ImageView
-                android:visibility="invisible"
-                android:id="@+id/download_check_btn"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_centerVertical="true"
-                app:riv_corner_radius="@dimen/_10sdp"
-                android:padding="@dimen/_8sdp"
-                android:src="@drawable/ic_check"
-                android:background="@drawable/icons_bg_shape"
-                android:layout_marginBottom="@dimen/_5sdp"
-                android:layout_marginEnd="@dimen/_5sdp"
-                app:layout_constraintBottom_toBottomOf="@id/photo"
-                app:layout_constraintEnd_toEndOf="@id/photo"
-                app:tint="@color/colorChecked" />
-            <ImageView
-                android:visibility="invisible"
-                android:id="@+id/download_btn"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_centerVertical="true"
-                app:riv_corner_radius="@dimen/_10sdp"
-                android:padding="@dimen/_8sdp"
-                android:src="@drawable/ic_arrow_download"
-                android:background="@drawable/icons_bg_shape"
-                android:layout_marginBottom="@dimen/_5sdp"
-                android:layout_marginEnd="@dimen/_5sdp"
-                app:layout_constraintBottom_toBottomOf="@id/photo"
-                app:layout_constraintEnd_toEndOf="@id/photo"
-                app:tint="@color/colorIcons" />
-        </com.wajahatkarim3.easyflipview.EasyFlipView>
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            app:layout_constraintBottom_toBottomOf="@id/photo"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
